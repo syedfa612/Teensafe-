@@ -1,0 +1,260 @@
+// Prisma schema for TeenSafe - A Consent-Based Digital Safety Platform
+// Database Provider: PostgreSQL (Compatible with Neon.tech / Supabase / Local Postgres)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -------------------------------------------------------------
+// ENUMS
+// -------------------------------------------------------------
+
+enum Role {
+  TEEN
+  PARENT
+  ADMIN
+}
+
+enum LinkStatus {
+  PENDING
+  ACTIVE
+  REVOKED
+}
+
+enum InputType {
+  TEXT
+  URL
+}
+
+enum RiskVerdict {
+  SAFE
+  CYBERBULLYING
+  PHISHING_SCAM
+  SUSPICIOUS
+}
+
+enum ReportCategory {
+  BULLYING
+  IMPERSONATION
+  SCAM
+  HARASSMENT
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  IN_REVIEW
+  RESOLVED
+}
+
+// -------------------------------------------------------------
+// CORE USER & PROFILES
+// -------------------------------------------------------------
+
+model User {
+  id           String      @id @default(cuid())
+  name         String
+  email        String      @unique
+  passwordHash String
+  role         Role        @default(TEEN)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  // Relationships
+  teenProfile   TeenProfile?
+  parentLinks   ParentLink[]  @relation("ParentLinks")
+  reportsFiled  Report[]      @relation("UserReports")
+  earnedBadges  UserBadge[]
+
+  @@map("users")
+}
+
+model TeenProfile {
+  id           String       @id @default(cuid())
+  userId       String       @unique
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ageGroup     String?      // e.g. "13-15", "16-18"
+  safetyScore  Int          @default(50) // Spine index: 0 - 100
+  streakDays   Int          @default(1)
+  lastActiveAt DateTime     @default(now())
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  // Relationships
+  quizAttempts  QuizAttempt[]
+  gameSessions  GameSession[]
+  scanHistories ScanHistory[]
+  parentLinks   ParentLink[] @relation("TeenLinks")
+
+  @@map("teen_profiles")
+}
+
+// -------------------------------------------------------------
+// CONSENT-BASED PARENT-TEEN LINKING (MODULE 3)
+// -------------------------------------------------------------
+
+model ParentLink {
+  id         String      @id @default(cuid())
+  parentId   String
+  parent     User        @relation("ParentLinks", fields: [parentId], references: [id], onDelete: Cascade)
+  teenId     String
+  teen       TeenProfile @relation("TeenLinks", fields: [teenId], references: [id], onDelete: Cascade)
+  inviteCode String      @unique
+  status     LinkStatus  @default(PENDING)
+  linkedAt   DateTime?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@unique([parentId, teenId])
+  @@map("parent_links")
+}
+
+// -------------------------------------------------------------
+// MODULE 1: LEARN & PLAY (TOPICS, LESSONS, QUIZZES, GAME)
+// -------------------------------------------------------------
+
+model Topic {
+  id          String         @id @default(cuid())
+  slug        String         @unique // e.g. "cyberbullying", "phishing", "privacy"
+  title       String
+  description String
+  icon        String         // Lucide icon identifier
+  order       Int            @default(0)
+  createdAt   DateTime       @default(now())
+
+  lessons     Lesson[]
+  questions   QuizQuestion[]
+
+  @@map("topics")
+}
+
+model Lesson {
+  id                 String   @id @default(cuid())
+  topicId            String
+  topic              Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  title              String
+  contentMarkdown    String   @db.Text
+  readingTimeMinutes Int      @default(3)
+  order              Int      @default(0)
+  createdAt          DateTime @default(now())
+
+  @@map("lessons")
+}
+
+model QuizQuestion {
+  id             String        @id @default(cuid())
+  topicId        String
+  topic          Topic         @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  scenarioText   String        @db.Text
+  options        Json          // Stored as array of strings: ["Option A", "Option B", ...]
+  correctIndex   Int           // 0-indexed position
+  explanation    String        @db.Text
+  order          Int           @default(0)
+  createdAt      DateTime      @default(now())
+
+  attempts       QuizAttempt[]
+
+  @@map("quiz_questions")
+}
+
+model QuizAttempt {
+  id             String       @id @default(cuid())
+  teenId         String
+  teen           TeenProfile  @relation(fields: [teenId], references: [id], onDelete: Cascade)
+  questionId     String
+  question       QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedOption Int
+  isCorrect      Boolean
+  attemptedAt    DateTime     @default(now())
+
+  @@index([teenId])
+  @@index([questionId])
+  @@map("quiz_attempts")
+}
+
+model GameSession {
+  id           String      @id @default(cuid())
+  teenId       String
+  teen         TeenProfile @relation(fields: [teenId], references: [id], onDelete: Cascade)
+  score        Int
+  correctCount Int
+  totalCount   Int
+  playedAt     DateTime    @default(now())
+
+  @@index([teenId])
+  @@map("game_sessions")
+}
+
+// -------------------------------------------------------------
+// MODULE 2: AI RISK SCANNER (PRIVACY-BY-DESIGN)
+// Note: Raw message/URL content is NEVER stored to protect minors.
+// -------------------------------------------------------------
+
+model ScanHistory {
+  id          String      @id @default(cuid())
+  teenId      String
+  teen        TeenProfile @relation(fields: [teenId], references: [id], onDelete: Cascade)
+  inputType   InputType
+  resultLabel RiskVerdict
+  confidence  Float       // e.g. 0.91 (91%)
+  riskFactors Json?       // Metadata: detected trigger phrases, flags, TLD info
+  scannedAt   DateTime    @default(now())
+
+  @@index([teenId])
+  @@map("scan_histories")
+}
+
+// -------------------------------------------------------------
+// MODULE 4: REPORT & HELP
+// -------------------------------------------------------------
+
+model Report {
+  id            String         @id @default(cuid())
+  userId        String?
+  user          User?          @relation("UserReports", fields: [userId], references: [id], onDelete: SetNull)
+  category      ReportCategory
+  description   String         @db.Text
+  attachmentUrl String?
+  status        ReportStatus   @default(PENDING)
+  isAnonymous   Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([status])
+  @@map("reports")
+}
+
+// -------------------------------------------------------------
+// GAMIFICATION: BADGES & ACHIEVEMENTS
+// -------------------------------------------------------------
+
+model Badge {
+  id             String      @id @default(cuid())
+  code           String      @unique // e.g. "FIRST_SCAN", "PHISHING_MASTER"
+  name           String
+  description    String
+  iconUrl        String
+  pointsRequired Int         @default(0)
+  createdAt      DateTime    @default(now())
+
+  userBadges     UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  earnedAt  DateTime @default(now())
+
+  @@unique([userId, badgeId])
+  @@map("user_badges")
+}
