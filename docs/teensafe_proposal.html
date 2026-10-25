@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TeenSafe - Project Synopsis & Phase-1 Implementation Specification</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 20mm 15mm 20mm 15mm;
+      @bottom-right {
+        content: counter(page);
+        font-size: 9pt;
+        color: #64748b;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.6;
+      font-size: 10.5pt;
+      margin: 0;
+      padding: 0;
+    }
+
+    .cover-page {
+      page-break-after: always;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 250mm;
+      border: 3px double #0f172a;
+      padding: 30px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .cover-header {
+      margin-top: 20px;
+    }
+
+    .institution-type {
+      font-size: 13pt;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #0369a1;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .degree-title {
+      font-size: 11pt;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .cover-main {
+      margin: auto 0;
+    }
+
+    .project-title {
+      font-size: 28pt;
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 1.2;
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
+    }
+
+    .project-subtitle {
+      font-size: 13pt;
+      font-weight: 600;
+      color: #0284c7;
+      margin-bottom: 25px;
+    }
+
+    .tagline-box {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-style: italic;
+      color: #166534;
+      max-width: 500px;
+      margin: 0 auto;
+      font-size: 10pt;
+    }
+
+    .cover-meta {
+      border-top: 2px solid #e2e8f0;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      text-align: left;
+      font-size: 10pt;
+    }
+
+    .cover-meta .label {
+      font-weight: bold;
+      color: #334155;
+    }
+
+    h1 {
+      font-size: 18pt;
+      color: #0f172a;
+      border-bottom: 2px solid #0284c7;
+      padding-bottom: 6px;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      page-break-after: avoid;
+    }
+
+    h2 {
+      font-size: 13pt;
+      color: #0369a1;
+      margin-top: 22px;
+      margin-bottom: 10px;
+      page-break-after: avoid;
+    }
+
+    h3 {
+      font-size: 11pt;
+      color: #334155;
+      margin-top: 16px;
+      margin-bottom: 6px;
+      page-break-after: avoid;
+    }
+
+    p {
+      margin-bottom: 10px;
+      text-align: justify;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      font-size: 9.5pt;
+      page-break-inside: avoid;
+    }
+
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background-color: #f8fafc;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f1f5f9;
+    }
+
+    .highlight-card {
+      background-color: #f8fafc;
+      border-left: 4px solid #0284c7;
+      padding: 12px 16px;
+      margin: 15px 0;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .privacy-card {
+      background-color: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      padding: 12px 16px;
+      margin: 15px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 9.5pt;
+    }
+
+    .warning-card {
+      background-color: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      padding: 12px 16px;
+      margin: 15px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 9.5pt;
+    }
+
+    .diagram-box {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 15px 0;
+      text-align: center;
+      page-break-inside: avoid;
+    }
+
+    .code-snippet {
+      font-family: "Courier New", Courier, monospace;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 8.5pt;
+      overflow-x: auto;
+      margin: 12px 0;
+      line-height: 1.4;
+      page-break-inside: avoid;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 8pt;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .badge-primary { background: #e0f2fe; color: #0369a1; }
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-warning { background: #fef3c7; color: #b45309; }
+
+    .page-break {
+      page-break-after: always;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER PAGE -->
+  <div class="cover-page">
+    <div class="cover-header">
+      <div class="institution-type">Master of Computer Applications (MCA)</div>
+      <div class="degree-title">Project Synopsis & Phase-1 Implementation Specification</div>
+      <div style="font-size: 9pt; color: #64748b; margin-top: 4px;">Milestone Target: 50% Functional Demonstration</div>
+    </div>
+
+    <div class="cover-main">
+      <div class="project-title">TeenSafe</div>
+      <div class="project-subtitle">A Consent-Based Digital Safety Platform for Adolescents</div>
+      
+      <div class="tagline-box">
+        <strong>Core Novelty Thesis:</strong><br>
+        &ldquo;TeenSafe is a consent-based, teen-first digital safety platform that replaces surveillance with education and self-awareness.&rdquo;
+      </div>
+    </div>
+
+    <div class="cover-meta">
+      <div>
+        <div class="label">Candidate:</div>
+        <div>Syed Faizan Pasha</div>
+        <div style="color: #64748b; font-size: 9pt;">Department of Computer Applications</div>
+      </div>
+      <div>
+        <div class="label">Evaluation Date:</div>
+        <div>November 22, 2026</div>
+        <div style="color: #64748b; font-size: 9pt;">Phase 1 Mentor Demonstration</div>
+      </div>
+      <div>
+        <div class="label">Tech Stack:</div>
+        <div>Next.js 15, PostgreSQL, Prisma</div>
+        <div style="color: #64748b; font-size: 9pt;">FastAPI + Scikit-Learn Microservice</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE OF CONTENTS / EXECUTIVE SUMMARY -->
+  <h1>1. Executive Summary & Problem Formulation</h1>
+  <p>
+    Contemporary parental monitoring software operates predominantly as covert spyware: keystroke logging, GPS tracking, and clandestine surveillance of private messages. While intended to shield minors from digital hazards, empirical adolescent psychology indicates that covert surveillance induces distrust, encourages evasive behavior (e.g., secondary hidden accounts or burner devices), and offers zero educational intuition.
+  </p>
+  <p>
+    <strong>TeenSafe</strong> fundamentally disrupts this paradigm. It treats the adolescent as an autonomous stakeholder in their own digital wellbeing. The teen owns the primary user account, learns proactive defense mechanisms through real-world scenario dilemmas, and utilizes on-demand Machine Learning scanning tools to evaluate suspicious messages and web links. Instead of broadcasting unedited private chats to parents, the system calculates an aggregate, holistic metric: <strong>The Unified Safety Score (0–100)</strong>. Parents are granted visibility solely into high-level wellness milestones upon bilateral consent.
+  </p>
+
+  <div class="highlight-card">
+    <strong>Key Academic Highlights for Evaluation:</strong>
+    <ul>
+      <li><strong>Consent-Driven Ethics:</strong> Direct replacement of parental spyware with minor empowerment and transparent, revocable linking.</li>
+      <li><strong>Privacy-by-Design Architecture:</strong> In-memory AI inference for suspicious text; raw message strings are discarded immediately and never stored in the database.</li>
+      <li><strong>Empirical Machine Learning:</strong> TF-IDF vectorization paired with linear classification (Logistic Regression & Linear SVM) validated on open benchmark datasets.</li>
+      <li><strong>The Unified Safety Score Spine:</strong> An algorithmic score (0–100) mathematically coupling lessons, quizzes, threat scans, and consistency streaks.</li>
+    </ul>
+  </div>
+
+  <h1>2. The System Spine: Unified Safety Score (0–100)</h1>
+  <p>
+    Rather than treating education, risk detection, and parental reporting as disconnected silos, TeenSafe binds every user interaction into a single composite index:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 28%;">User Activity</th>
+        <th style="width: 22%;">Score Impact</th>
+        <th style="width: 50%;">Educational & Behavioral Objective</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Lesson Mastery</strong></td>
+        <td><span class="badge badge-primary">+10 to +25 pts</span></td>
+        <td>Provides baseline conceptual literacy across digital threats.</td>
+      </tr>
+      <tr>
+        <td><strong>Scenario Quiz Accuracy</strong></td>
+        <td><span class="badge badge-primary">+5 to +15 pts</span></td>
+        <td>Evaluates behavioral decision-making under realistic simulated peer pressure.</td>
+      </tr>
+      <tr>
+        <td><strong>AI Threat / Link Scan</strong></td>
+        <td><span class="badge badge-success">+2 pts (Habit Bonus)</span></td>
+        <td>Rewards the reflex to inspect unknown links and DMs before engaging.</td>
+      </tr>
+      <tr>
+        <td><strong>Learning Streak (Consistency)</strong></td>
+        <td><span class="badge badge-warning">+2 pts / day active</span></td>
+        <td>Incentivizes sustained weekly engagement rather than one-time cramming.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <h1>3. Scope Matrix: Phase 1 (50% Milestone) vs. Phase 2</h1>
+  <p>
+    For the Phase 1 Mentor Demonstration on <strong>November 22, 2026</strong>, the system delivers vertical end-to-end functionality across core components:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Subsystem / Module</th>
+        <th>Phase 1 Deliverables (Target: Nov 22)</th>
+        <th>Phase 2 Enhancements</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Authentication & RBAC</strong></td>
+        <td>Full Role-Based Access Control (`TEEN`, `PARENT`, `ADMIN`) with secure JWT sessions and one-click demo credentials.</td>
+        <td>OAuth2 social logins, 2FA authenticator app integration.</td>
+      </tr>
+      <tr>
+        <td><strong>Database Architecture</strong></td>
+        <td>Full 11-table relational PostgreSQL schema implemented via Prisma ORM with foreign keys and cascading rules.</td>
+        <td>Automated backups, multi-region read replicas.</td>
+      </tr>
+      <tr>
+        <td><strong>Module 1: Learn & Play</strong></td>
+        <td>5 complete topics with scenario-based MCQs, instant pedagogical feedback, and attempt tracking.</td>
+        <td>&ldquo;Real or Scam?&rdquo; swipe mini-game, badges engine.</td>
+      </tr>
+      <tr>
+        <td><strong>Module 2: AI Risk Scanner ⭐</strong></td>
+        <td>Dual engine: Heuristic URL threat detector + Text classifier (Cyberbullying / Scam / Safe) with explainability and privacy logging.</td>
+        <td>Fine-tuned transformer microservice, contextual screenshot OCR.</td>
+      </tr>
+      <tr>
+        <td><strong>Module 3: Parent Console</strong></td>
+        <td>Consent-based progress overview, weak topics review, and 6-digit invite code generator.</td>
+        <td>Automated weekly email digests, family discussion suggestions.</td>
+      </tr>
+      <tr>
+        <td><strong>Module 4: Incident & Help</strong></td>
+        <td>Anonymous reporting form with category routing, national emergency helplines (1930, 1098).</td>
+        <td>Institutional counselor triage workflow, ticket escalation.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h1>4. Database Schema & Entity-Relationship Model</h1>
+  <p>
+    The persistence layer is structured in PostgreSQL via Prisma with 11 distinct entities representing user identities, learning progress, risk scans, and reporting:
+  </p>
+
+  <div class="code-snippet">
+// Core Relational Tables
+User             (id, name, email, passwordHash, role, createdAt, updatedAt)
+TeenProfile      (id, userId FK, ageGroup, safetyScore, streakDays, lastActiveAt)
+ParentLink       (id, parentId FK, teenId FK, inviteCode, status, linkedAt)
+Topic            (id, slug, title, description, icon, order, createdAt)
+Lesson           (id, topicId FK, title, contentMarkdown, readingTimeMinutes, order)
+QuizQuestion     (id, topicId FK, scenarioText, options [JSON], correctIndex, explanation)
+QuizAttempt      (id, teenId FK, questionId FK, selectedOption, isCorrect, attemptedAt)
+GameSession      (id, teenId FK, score, correctCount, totalCount, playedAt)
+ScanHistory      (id, teenId FK, inputType, resultLabel, confidence, riskFactors, scannedAt)
+Report           (id, userId FK?, category, description, attachmentUrl, status, isAnonymous)
+Badge            (id, code, name, description, iconUrl, pointsRequired)
+UserBadge        (id, userId FK, badgeId FK, earnedAt)
+  </div>
+
+  <div class="privacy-card">
+    <strong>🔒 Privacy-by-Design Compliance (Viva Defense Point):</strong><br>
+    Notice that the <code>ScanHistory</code> entity stores only <code>inputType</code>, <code>resultLabel</code>, <code>confidence</code>, and categorical <code>riskFactors</code>. The raw input string containing minors&apos; personal messages is processed transiently in memory and discarded. No private conversation logs are persisted or exposed to parental dashboards.
+  </div>
+
+  <div class="page-break"></div>
+
+  <h1>5. Module 2: AI Risk Scanner Architecture ⭐</h1>
+  <p>
+    The AI Risk Scanner microservice implements a hybrid threat detection architecture combining deterministic heuristics with probabilistic machine learning:
+  </p>
+
+  <div class="diagram-box">
+    <svg width="600" height="140" viewBox="0 0 600 140" xmlns="http://www.w3.org/2000/svg">
+      <!-- Input -->
+      <rect x="10" y="45" width="110" height="50" rx="8" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+      <text x="65" y="75" font-size="11" font-weight="bold" fill="#0f172a" text-anchor="middle">Input Text / URL</text>
+
+      <path d="M 120 70 L 170 70" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+      <!-- Router -->
+      <polygon points="210,40 260,70 210,100 160,70" fill="#f8fafc" stroke="#475569" stroke-width="2"/>
+      <text x="210" y="73" font-size="9" font-weight="bold" fill="#0f172a" text-anchor="middle">Type?</text>
+
+      <path d="M 210 40 L 210 20 L 290 20" stroke="#64748b" stroke-width="2"/>
+      <path d="M 210 100 L 210 120 L 290 120" stroke="#64748b" stroke-width="2"/>
+
+      <!-- URL Rules -->
+      <rect x="290" y="5" width="140" height="35" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+      <text x="360" y="27" font-size="9" font-weight="bold" fill="#92400e" text-anchor="middle">Deterministic URL Rules</text>
+
+      <!-- ML Text -->
+      <rect x="290" y="100" width="140" height="35" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="360" y="122" font-size="9" font-weight="bold" fill="#5b21b6" text-anchor="middle">TF-IDF + Classifier</text>
+
+      <path d="M 430 22 L 470 22 L 470 55" stroke="#64748b" stroke-width="2"/>
+      <path d="M 430 118 L 470 118 L 470 85" stroke="#64748b" stroke-width="2"/>
+
+      <!-- Output Sanitizer -->
+      <rect x="440" y="55" width="150" height="35" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+      <text x="515" y="77" font-size="9" font-weight="bold" fill="#14532d" text-anchor="middle">Privacy Drop & Verdict</text>
+    </svg>
+  </div>
+
+  <h2>5.1 Deterministic URL Threat Heuristics</h2>
+  <ul>
+    <li><strong>Typosquatting & Lookalike Domains:</strong> Regex mapping identifies brand impersonations (e.g., <code>faceb00k.com</code>, <code>paypa1.com</code>, <code>instagrarn.com</code>).</li>
+    <li><strong>High-Risk TLD Filtering:</strong> Evaluates low-reputation top-level domains commonly registered by automated phishing kits (<code>.xyz</code>, <code>.top</code>, <code>.tk</code>, <code>.buzz</code>).</li>
+    <li><strong>Protocol & Host Anomalies:</strong> Flags raw IP addresses in place of domain names and unencrypted HTTP connections.</li>
+    <li><strong>Credential Obfuscation:</strong> Detects deceptive <code>@</code> syntax used to conceal target destinations.</li>
+  </ul>
+
+  <h2>5.2 Natural Language Classifier Pipeline</h2>
+  <ul>
+    <li><strong>Dataset Benchmarking:</strong> Trained on open standard corpuses: Kaggle <em>Cyberbullying Classification</em> and <em>SMS Spam Collection</em> datasets.</li>
+    <li><strong>Feature Extraction:</strong> Sub-linear TF-IDF vectorization with n-gram range (1, 2) capped at 5,000 salient features.</li>
+    <li><strong>Model Comparison (Academic Viva Requirement):</strong> Evaluated against Multinomial Naive Bayes, Logistic Regression, and Linear Support Vector Classifier (LinearSVC).</li>
+  </ul>
+
+  <h1>6. Demonstration Credentials & Verification Guide</h1>
+  <p>
+    The system includes pre-configured, self-contained demonstration profiles allowing instant evaluation without manual data entry:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Role</th>
+        <th>Demo Email</th>
+        <th>Demo Password</th>
+        <th>Target Dashboard Route</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>TEEN</strong></td>
+        <td><code>teen.alex@example.com</code></td>
+        <td><code>SafeTeen2026!</code></td>
+        <td><code>/dashboard</code> (Score: 78/100, 4-day streak, AI Scanner)</td>
+      </tr>
+      <tr>
+        <td><strong>PARENT</strong></td>
+        <td><code>parent.smith@example.com</code></td>
+        <td><code>SafeParent2026!</code></td>
+        <td><code>/parent</code> (Consent metrics, weak topic flags)</td>
+      </tr>
+      <tr>
+        <td><strong>COUNSELOR</strong></td>
+        <td><code>admin.safety@example.com</code></td>
+        <td><code>SafeAdmin2026!</code></td>
+        <td><code>/admin</code> (Incident triage, crisis queue)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h1>7. Summary & Conclusion</h1>
+  <p>
+    TeenSafe successfully bridges the ethical gap between adolescent digital autonomy and parental peace of mind. By implementing an educational, scenario-driven learning engine coupled with real-time AI risk evaluation and transparent consent mechanisms, the platform empowers teens with long-term digital discernment rather than short-term subjection to surveillance.
+  </p>
+  <p>
+    The Phase 1 prototype meets 100% of the milestone requirements: fully authenticated RBAC, production database schema, functional learning and quiz modules, active AI risk scanner, and responsive dashboards ready for mentor demonstration.
+  </p>
+
+</body>
+</html>
