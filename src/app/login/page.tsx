@@ -50,14 +50,17 @@ export default function LoginPage() {
     }
   };
 
-  const handleDemoFill = (selectedRole: "TEEN" | "PARENT") => {
+  const handleDemoFill = (selectedRole: "TEEN" | "PARENT" | "ADMIN") => {
     setRole(selectedRole);
     if (selectedRole === "TEEN") {
       setEmail("teen.alex@example.com");
       setPassword("SafeTeen2026!");
-    } else {
+    } else if (selectedRole === "PARENT") {
       setEmail("parent.smith@example.com");
       setPassword("SafeParent2026!");
+    } else {
+      setEmail("admin.safety@example.com");
+      setPassword("SafeAdmin2026!");
     }
   };
 
@@ -163,14 +166,14 @@ export default function LoginPage() {
               <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
               <span>Quick Demo Helper (One-Click Fill):</span>
             </div>
-            <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
               <button
                 type="button"
                 onClick={() => handleDemoFill("TEEN")}
                 className="bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-lg p-2 text-left transition"
               >
                 <div className="font-semibold text-cyan-400">Teen Demo</div>
-                <div className="text-[11px] text-slate-400 truncate">teen.alex@example.com</div>
+                <div className="text-[10px] text-slate-400 truncate">teen.alex@example.com</div>
               </button>
               <button
                 type="button"
@@ -178,7 +181,15 @@ export default function LoginPage() {
                 className="bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-lg p-2 text-left transition"
               >
                 <div className="font-semibold text-purple-400">Parent Demo</div>
-                <div className="text-[11px] text-slate-400 truncate">parent.smith@example.com</div>
+                <div className="text-[10px] text-slate-400 truncate">parent.smith@example.com</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDemoFill("ADMIN")}
+                className="bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-lg p-2 text-left transition"
+              >
+                <div className="font-semibold text-amber-400">Counselor Demo</div>
+                <div className="text-[10px] text-slate-400 truncate">admin.safety@example.com</div>
               </button>
             </div>
           </div>

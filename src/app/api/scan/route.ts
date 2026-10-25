@@ -161,22 +161,27 @@ export async function POST(request: Request) {
     // 3. Privacy-First Database Logging
     // Note: We deliberately do NOT save the `input` string.
     if (user?.teenProfile) {
-      await prisma.scanHistory.create({
-        data: {
-          teenId: user.teenProfile.id,
-          inputType: isUrl ? "URL" : "TEXT",
-          resultLabel,
-          confidence,
-          riskFactors: riskFactors.length > 0 ? riskFactors : ["No known risk indicators identified"],
-        },
-      });
+      try {
+        await prisma.scanHistory.create({
+          data: {
+            teenId: user.teenProfile.id,
+            inputType: isUrl ? "URL" : "TEXT",
+            resultLabel,
+            confidence,
+            riskFactors: riskFactors.length > 0 ? riskFactors : ["No known risk indicators identified"],
+          },
+        });
 
-      // Reward points for good digital safety habit (+2 points up to max 100)
-      const newScore = Math.min(100, user.teenProfile.safetyScore + 2);
-      await prisma.teenProfile.update({
-        where: { id: user.teenProfile.id },
-        data: { safetyScore: newScore },
-      });
+        // Reward points for good digital safety habit (+2 points up to max 100)
+        const newScore = Math.min(100, user.teenProfile.safetyScore + 2);
+        await prisma.teenProfile.update({
+          where: { id: user.teenProfile.id },
+          data: { safetyScore: newScore },
+        });
+      } catch (dbErr) {
+        // Non-blocking in demo mode or when offline
+        console.warn("Scan history DB persist bypassed:", dbErr);
+      }
     }
 
     return NextResponse.json({
